@@ -1138,7 +1138,7 @@ int main()
 
     double fov = 60 * M_PI / 180;
 
-    int nbrays = 40;
+    int nbrays = 200;
     double angleVertical = 0 * M_PI / 180, angleHorizontal = 0 * M_PI / 180;
     Vector up(0, cos(angleVertical), sin(angleVertical));
     Vector right(cos(angleHorizontal), 0, sin(angleHorizontal));

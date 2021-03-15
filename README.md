@@ -4,8 +4,8 @@ Le but de ce rapport est de détailler les méthodes mises en place pour réalis
 
 - 1 : La mise en place de méthodes de calcul d'intersection rayons-sphère et génération de lumière
 - 2 : La mise en place d’ombres portées, de correction gamma, de surfaces spéculaires et transparentes.
-- 3 :La mise en place de l’équation du rendu, d’intégration de Monte-Carlo et d’éclairage indirect.
-- 4 : La mise en place d’anti-Aliasing, d’ombres douces, de différents modèles de caméra, depth-of-field.
+- 3 : La mise en place de l’équation du rendu, d’intégration de Monte-Carlo et d’éclairage indirect.
+- 4 : La mise en place d’anti-Aliasing, d’ombres douces, de différents modèles de caméra.
 - 5 : La mise en place d’intersection rayon-plan, rayon-triangle, rayon-boite englobante, de gestion des maillages. Le but de toutes ces implémentations est de pouvoir travailler avec des formes plus complexes (maillages) et de diminuer les temps de calcul.
 
 L’ensemble du code à été réalisé en C++. Ce code peut être trouvé en pièce jointe de ce rapport. Il est important de noter que certains visuels ont dû être réalisé lors de la rédaction de ce rapport. Certains visuels contiennent des éléments qui ont été implémentés plus taard dans le rapport.
@@ -63,4 +63,48 @@ On obtient alors le résultat suivant :
 
 ![3 sphères](images/3_spheres.png)
 
-On notera l'ajout d'ombres et les nouvelles "textures" de sphères.
+On notera l'ajout d'ombres et les nouvelles "textures" de sphères. Ce rendu a été réalisé avec l'échantillonage de rayons aléatoire (cf. ci-après), c'est pour cela que l'image apparait quelques peu bruitée.
+
+## 3. Equation du rendu, Monte-Carlo et de l'éclairage indirect
+
+L'idée pour l'éclairage indirect est que pour chaque rebond, au lieu que le rayon rebondisse de manière déterministe comme pour une surface mirrior, il va rebondir de manière aléatoire. La direction du rebond est alors généré via une BRDF. Etant donné la perte du caractère déterministe des rayon à cause de l'utilisation de BRDF, il est nécessaire d'introduire l'équation du rendu qui va permettre pour chaque rayon de calculer son intensité lumineuse en fonction de sa trajectoire.
+
+Voici l'équation du rendu :
+
+![Equation du rendu](images/eq_rendu.png)
+
+Avec :
+
+- $L_{o}$ l'intensité lumineuse sortante
+- $E$ l'emmissivité de la surface
+- $f$ la BRDF
+- $L_{i}$ l'intensité lumineuse entrante
+- $teta_{i}$ l'angle d'incidence
+
+On notera que pour chaque rayon il faudra intégrer au minimum $N$ fois avec $N$ le nombre de rebonds. Pour le faire numériquement, on utilise la méthode de Monte-Carlo dont la formule est rappellée ci-dessous :
+
+![Mont-Carlo](images/eq_MC.png)
+
+Avec cette echantillonage de rayons aléatoire, on obtient une image bruitée (cf.partie 2), cependant on peut lisser ce comportement en multipliant le nombre de rayons. Voici le même exemple que ci-dessus mais avec 5 fois plus de rayons :
+
+![200 rayons](images/img_200_rays.png)
+
+## 4. Anti-aliasing, ombres douces & camera
+
+L'antiliasing a pour but de gommer l'aspect echantilloné du rendu que nous obtenons. En effet, nous ne considerons pour notre image uniqument les rayons qui passent par le centre de chaque pixel, dans la réalité il y a de l'information qui arrive entre chaque pixel et l'objectif est de prendre en compte cette information. Le principe est qu'au lieu d'envoyer $m$ rayons au centre de chaque pixel, on va pérturber légerment la direction de chaque rayon pour qu'il vienne taper d'autres zones du "capteur". Pour que notre perturbation ai du sens, on utilise la méthode de Box-Muller afin d'obtenir des echantillons gaussien. De cette manière, les rayons restent centrés autour du centre du pixel.
+
+Voilà le rendu le long d'une courbe où la discontinuité peut engendrer des créneaux lors du rendu :
+
+![Antiliasing](images/antiliasing.png)
+
+On notera que la a surface n'est pas totalement lisse. Cet essai a été réalisé avec 200 rayons, en augmentant le nombre de rayon, cela permettrai de rendre le rendu encore plus lisse.
+
+Pour les ombres douces, le principe est de moduler l'impact de la lumière direct et de la lumière diffuse afin d'obtenir une ombre moins tranchante. Pour ce faire, il faut introduire une probabilité $p$ de selection du rayon direct ou diffus :
+
+![Probabilité de selection](images/proba.png)
+
+On obtient alors l'estimateur de Monte-Carlo suivant :
+
+![Estimateur ajusté](images/estimateur.png)
+
+Pour l'ajustement de la caméra, il suffit
