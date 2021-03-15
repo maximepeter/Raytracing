@@ -8,7 +8,7 @@ Le but de ce rapport est de détailler les méthodes mises en place pour réalis
 - 4 : La mise en place d’anti-Aliasing, d’ombres douces, de différents modèles de caméra, depth-of-field.
 - 5 : La mise en place d’intersection rayon-plan, rayon-triangle, rayon-boite englobante, de gestion des maillages. Le but de toutes ces implémentations est de pouvoir travailler avec des formes plus complexes (maillages) et de diminuer les temps de calcul.
 
-L’ensemble du code à été réalisé en C++. Ce code peut être trouvé en pièce jointe de ce rapport.
+L’ensemble du code à été réalisé en C++. Ce code peut être trouvé en pièce jointe de ce rapport. Il est important de noter que certains visuels ont dû être réalisé lors de la rédaction de ce rapport. Certains visuels contiennent des éléments qui ont été implémentés plus taard dans le rapport.
 
 ## 1. Mise en place du projet
 
@@ -40,3 +40,27 @@ Une fois l'ensemble de ces objets initialisés dans la scene, on obtinent le ré
 ![Première scène](images/first_scene.png)
 
 ## 2. Mise en place d'ombres, de surfaces mirroirs et transparentes
+
+Cette partie est destiné à changer la nature de nos objet et à mettre en place les ombrese projetées.
+
+La gestion des ombres est géré par la comparaison des points d'intersection entre une sphère et un rayon. La comparaison entre la distance entre le point d'intersection et la source lumineuse permet de détecter si notre objet est devant ou derrière la source lumineuse (relativement à notre caméra) et donc si une ombre doit être projettée.
+
+Pour les surfaces miroirs, au lieu d’envoyer un rayon dans la direction de la lumière L, on va simplement réfléchir le rayon incident autour de la normale à l’objet, et renvoyer la couleurs de ce qui est réfléchit. Dans ce cas là, on respecte les lois de la physique concernant les miroirs.
+
+Pour les surfaces transparentes, on implémente la loi de Snell-Descartes qui permet de réaliser la gestion des rayons refractés :
+
+![Snell-Descartes](images/snell-descartes.png)
+
+D'autre part, il est important de prendre en compte les facteurs gamma des écrans afin d'obtenir un rendu des couleurs fidèle à notre scène. Pour se faire, on appliquera la fonction x^(1./2.2) à chaque composante RGB de l'image.
+
+Une fois tous ces implémentations réalisées, on ajoute à notre scène 3 sphères :
+
+- Une bleue
+- Une transparente
+- Une mirroir
+
+On obtient alors le résultat suivant :
+
+![3 sphères](images/3_spheres.png)
+
+On notera l'ajout d'ombres et les nouvelles "textures" de sphères.

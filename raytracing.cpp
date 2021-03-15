@@ -1057,18 +1057,15 @@ int main()
     // integrate4D();
     // return 0;
 
-    Vector C(0, 30, 55);
+    Vector C(0, 0, 55);
     Scene scene;
     scene.I = 5E9;
-    scene.L = Vector(-10, 50, 40);
+    scene.L = Vector(-10, 70, 40);
 
     Sphere Slum(scene.L, 5, Vector(1., 1., 1.));
-    Sphere S4(Vector(-15, 30, -30), 10, Vector(0., 0., 1.));
-    Sphere S5(Vector(0, 30, -30), 10, Vector(1., 1., 1.), true);
-    Sphere S6(Vector(15, 30, -30), 10, Vector(1., 0., 0.), false, true);
-    Sphere S1(Vector(-15, 0, 0), 10, Vector(0., 0., 1.));
-    Sphere S2(Vector(0, 0, 0), 10, Vector(1., 1., 1.), true);
-    Sphere S3(Vector(15, 0, 0), 10, Vector(1., 0., 0.), false, true);
+    Sphere S1(Vector(-17, 0, 0), 10, Vector(0., 0.5, 1.));
+    Sphere S2(Vector(0, 10, 0), 10, Vector(1., 1., 1.), true);
+    Sphere S3(Vector(17, 20, 0), 10, Vector(1., 0., 0.), false, true);
     Sphere Smurga(Vector(-1000, 0, 0), 970, Vector(0., 0., 1.));
     Sphere Smurdr(Vector(1000, 0, 0), 970, Vector(1., 0., 0.));
     Sphere Smurfa(Vector(0, 0, -1000), 940, Vector(0., 1., 0.));
@@ -1123,12 +1120,9 @@ int main()
     // m.buildBB();
 
     scene.objects.push_back(&Slum);
-    // scene.objects.push_back(&S4);
-    // scene.objects.push_back(&S5);
-    // scene.objects.push_back(&S6);
-    // scene.objects.push_back(&S1);
-    // scene.objects.push_back(&S2);
-    // scene.objects.push_back(&S3);
+    scene.objects.push_back(&S1);
+    scene.objects.push_back(&S2);
+    scene.objects.push_back(&S3);
     scene.objects.push_back(&Smurga);
     scene.objects.push_back(&Smurdr);
     scene.objects.push_back(&Smurfa);
@@ -1138,13 +1132,13 @@ int main()
     //scene.objects.push_back(&m);
     //scene.objects.push_back(&m2);
     // scene.objects.push_back(&mtable);
-    scene.objects.push_back(&SMm);
+    //scene.objects.push_back(&SMm);
 
     // scene.objects.push_back(&STm);
 
     double fov = 60 * M_PI / 180;
 
-    int nbrays = 5;
+    int nbrays = 40;
     double angleVertical = 0 * M_PI / 180, angleHorizontal = 0 * M_PI / 180;
     Vector up(0, cos(angleVertical), sin(angleVertical));
     Vector right(cos(angleHorizontal), 0, sin(angleHorizontal));
@@ -1219,3 +1213,4 @@ int main()
 
 // run command line
 // g++ raytracing.cpp -o raytracing.out
+// ./raytracing.out 
