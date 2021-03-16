@@ -1,12 +1,16 @@
 # Raytracing
 
+## Introduction
+
 Le but de ce rapport est de détailler les méthodes mises en place pour réaliser le développement d’un algorithme de raytracing. L’objectif est de créer et de simuler le comportement de la lumière afin de réaliser un rendu le plus réaliste (prise en compte de reflets, d’ombres, de réfraction etc …). Ce TP se décompose en plusieurs phase :
 
 - 1 : La mise en place de méthodes de calcul d'intersection rayons-sphère et génération de lumière
 - 2 : La mise en place d’ombres portées, de correction gamma, de surfaces spéculaires et transparentes.
 - 3 : La mise en place de l’équation du rendu, d’intégration de Monte-Carlo et d’éclairage indirect.
 - 4 : La mise en place d’anti-Aliasing, d’ombres douces, de différents modèles de caméra.
-- 5 : La mise en place d’intersection rayon-plan, rayon-triangle, rayon-boite englobante, de gestion des maillages. Le but de toutes ces implémentations est de pouvoir travailler avec des formes plus complexes (maillages) et de diminuer les temps de calcul.
+- 5 : La mise en place d’intersection rayon-plan, rayon-triangle, rayon-boite englobante, de gestion des maillages.
+
+Le but de toutes ces implémentations est de pouvoir travailler avec des formes plus complexes (maillages) et de diminuer les temps de calcul.
 
 L’ensemble du code à été réalisé en C++. Ce code peut être trouvé en pièce jointe de ce rapport. Il est important de noter que certains visuels ont dû être réalisé lors de la rédaction de ce rapport. Certains visuels contiennent des éléments qui ont été implémentés plus taard dans le rapport.
 
@@ -38,6 +42,8 @@ On implémente alors des fonctions intersect dans les classes Sphere et Scene af
 Une fois l'ensemble de ces objets initialisés dans la scene, on obtinent le résultat suivant :
 
 ![Première scène](images/first_scene.png)
+
+On notera que la caméra est orientée selon le vecteur (0; 0; -1).
 
 ## 2. Mise en place d'ombres, de surfaces mirroirs et transparentes
 
@@ -107,4 +113,45 @@ On obtient alors l'estimateur de Monte-Carlo suivant :
 
 ![Estimateur ajusté](images/estimateur.png)
 
-Pour l'ajustement de la caméra, il suffit
+Pour l'ajustement de la caméra, on introduit deux vecteur "up" et "right qui ont pour but de générer la nouvelle direction de la caméra : leur produit vectoriel permettra de définir la nouvelle direction de la camera.
+
+## 5. Mise en place d’intersection rayon-plan, rayon-triangle, rayon-boite englobante, de gestion des maillages
+
+Pour obtenir des scènes plus complexes, on souhaite pouvioir introduire des formes complexes dans notre scène. Cela implique de pouvoir gérer des maillaiges. On considèrera des maillaige à maille triangulaire. Le traitement de c'est maillage est réalisé en calculant l'intersection entre chaque maille triangulaire et les rayons. Les implémentations réalisées précédemant s'adaptent sans problèmes.
+
+Pour se faire, il est nécessaire d'implémenter le calcul de l'intersection entre un rayon et un plan.
+Le paramétrage d'un plan de normale $N$ et passant par $P_{0}$ est le suivant :
+
+![Equation plan](images/plan.png)
+
+En remplaçant $P$ par son équation pour un rayon d'origine $C$ on obtient :
+
+![Intersection Plan-Ray](images/plan_ray.png)
+
+En résolvant cette équation, on obtient les intersections entre les rayons et les plans. Il reste à déterminer l'appartenance au triangle. Pour ce faire, on introduit les coordonnées barycentriques.
+
+Soit un triangle de sommets ($P_{1}$, $P_{2}$, $P_{3}$), $P$ le point d'intersection et $lambda_{1}$, $lambda_{2}$, $lambda_{3}$ 3 scalaires.
+
+On a alors en coordonnées barycentriques :
+
+![Barycentre](images/bary.png)
+
+On teste alors si tous les lambda sont compris entre 0 et 1, si c'est le cas, alors l'intersection appartient au triangle et il faut traiter cette intersection. Avec ce raisonnement on est capable de traiter toute sorte de maillage.
+
+Côté implémentation, il est nécessaire d'introduire une nouvelle classe TriangleMesh munie d'une nouvelle routine d'intersection.
+
+En important des maillages, on peut obtenir ce type de résultat :
+
+![Scène avec maillage](images/maillage.png)
+
+Les performances en terme de temps de calcul peuvent être améliorées dans la mesure où on réalise trop de test d'intéraction. Il est nécessaire de mettre en place des boîtes englobantes qui permettent d'économiser ces calculs.
+
+Le test à réaliser avant de faire les tests d'intersection est le test d'appartenance d'un triangle a une boite englobante. Ce test est réalisé selon le théorème de séparation des convexes. Si ce test n'est pas positif, on abandonne les calculs suivant et on passe à la suite.
+
+Une fois toutes les méthodes vues plus haut implémentées, il est possible de mettre en place une scène "complexe" comme suit :
+
+![Scène finale](image/scene_finale.png)
+
+## Conclusion
+
+Ce projet a permit de mettre en place, en partant de rien, une structure de code répliquant les phénomènes optiques (gestion de la lumière, des reflets, de la réfraction ...) réels afin de mettre en place des scènes statiques composées de formes géométriques simples et des maillages complexes.
