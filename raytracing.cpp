@@ -694,22 +694,40 @@ public:
                             normale = alpha * normals[indices[i].ni] + beta * normals[indices[i].nj] + gamma * normals[indices[i].nk];
                             normale = normale.get_normalized();
                             P = r.C + r.u;
-                            int H = Htex[indices[i].group],
+
+                            if (textures.size() > 0){
+                                
+                                int H = Htex[indices[i].group],
                                 W = Wtex[indices[i].group];
-                            Vector UV = alpha * uvs[indices[i].uvi] + beta * uvs[indices[i].uvj] + gamma * uvs[indices[i].uvk];
-                            UV = UV * Vector(W, H, 0);
-                            int uvx = UV[0] + 0.5;
-                            int uvy = UV[1] + 0.5;
-                            uvx = uvx % W;
-                            uvy = uvy % H;
-                            if (uvx < 0)
-                                uvx += W;
-                            if (uvy < 0)
-                                uvy += H;
-                            uvy = H - uvy - 1;
-                            color = Vector(std::pow(textures[indices[i].group][(uvy * W + uvx) * 3] / 255., 2.2),
-                                           std::pow(textures[indices[i].group][(uvy * W + uvx) * 3 + 1] / 255., 2.2),
-                                           std::pow(textures[indices[i].group][(uvy * W + uvx) * 3 + 2] / 255., 2.2));
+                                Vector UV = alpha * uvs[indices[i].uvi] + beta * uvs[indices[i].uvj] + gamma * uvs[indices[i].uvk];
+                                UV = UV * Vector(W, H, 0);
+                                int uvx = UV[0] + 0.5;
+                                int uvy = UV[1] + 0.5;
+                                if (W > 0 && H > 0){
+                                    uvx = uvx % W;
+                                    uvy = uvy % H;
+                                    if (uvx < 0)
+                                        uvx += W;
+                                    if (uvy < 0)
+                                        uvy += H;
+                                    uvy = H - uvy - 1;
+
+                                    //color = Vector(100, 100, 100);
+
+                                    color = Vector(std::pow(textures[indices[i].group][(uvy * W + uvx) * 3] / 255., 2.2),
+                                                   std::pow(textures[indices[i].group][(uvy * W + uvx) * 3 + 1] / 255., 2.2),
+                                                   std::pow(textures[indices[i].group][(uvy * W + uvx) * 3 + 2] / 255., 2.2));
+                                }
+                                
+
+                            }
+                            
+
+                            else{
+                                color = albedo;
+                            }
+
+                            
                         }
                     }
                 }
@@ -1051,11 +1069,8 @@ void integrate4D()
 int main()
 {
     float ini_time = clock();
-    int W = 512;
-    int H = 512;
-    // integrateCos();
-    // integrate4D();
-    // return 0;
+    int W = 600;
+    int H = 600;
 
     Vector C(0, 0, 55);
     Scene scene;
@@ -1064,7 +1079,7 @@ int main()
 
     Sphere Slum(scene.L, 5, Vector(1., 1., 1.));
     Sphere S1(Vector(-17, 0, 0), 10, Vector(0., 0.5, 1.));
-    Sphere S2(Vector(0, 10, 0), 10, Vector(1., 1., 1.), true);
+    //Sphere S2(Vector(0, 10, 0), 10, Vector(1., 1., 1.), true);
     Sphere S3(Vector(17, 20, 0), 10, Vector(1., 0., 0.), false, true);
     Sphere Smurga(Vector(-1000, 0, 0), 970, Vector(0., 0., 1.));
     Sphere Smurdr(Vector(1000, 0, 0), 970, Vector(1., 0., 0.));
@@ -1072,20 +1087,19 @@ int main()
     Sphere Smurde(Vector(0, 0, 1000), 940, Vector(1., 0., 1.));
     Sphere Ssol(Vector(0, -1000, 0), 990, Vector(1., 1., 1.), false);
     Sphere Splafond(Vector(0, 1000, 0), 990, Vector(1., 1., 1.));
-    //TriangleMesh m(Vector(0., 1., 1.), false, false);
-    //TriangleMesh m2(Vector(1., 1., 1.), false, false);
-    //TriangleMesh mtable(Vector(1., 1., 1.), false, false);
+    TriangleMesh statue(Vector(0., 0.5, 0.5), false, false);
+    TriangleMesh duck(Vector(1., 1., 1.), false, false);
     Sphere SMm(Vector(20, 20, -10), 10, Vector(1., 1., 1.), true);
     Sphere STm(Vector(0, 0, 10), 10, Vector(1., 1., 1.), false, true);
-    //m.readOBJ("./chien/13463_Australian_Cattle_Dog_v3.obj");
-    //m.loadTexture("./chien/Australian_Cattle_Dog_dif.jpg");
 
-    //m2.readOBJ("./dumbell/10499_Dumbells_v1_L3.obj");
-    //m2.loadTexture("./dumbell/10499_Dumbells_v1_diffuse.jpg");
+    statue.readOBJ("./maillages/statue/12328_Statue_v1_L2.obj");
+    statue.loadTexture("./maillages/statue/statue.jpg");
 
-    //mtable.readOBJ("./table/table.obj");
-    //mtable.loadTexture("./table/render 1.jpg");
+    duck.readOBJ("./maillages/canard/12248_Bird_v1_L2.obj");
+    duck.loadTexture("./maillages/canard/12248_Bird_v1_diff.jpg");
+
     // modifier les donnees pour rapeticer ou agrandir l'image
+
     //for (int i = 0; i < m2.vertices.size(); i++)
     {
         // O vers la droite 1 vers le haut 2 profondeur
@@ -1099,29 +1113,93 @@ int main()
     //     mtable.vertices[i][0] -= 25;
     //     mtable.vertices[i][2] = -mtable.vertices[i][2];
     // }
-    //for (int i = 0; i < m.vertices.size(); i++)
+
+
+
+    for (int i = 0; i < statue.vertices.size(); i++)
     {
 
-        // inversion y et z
-        //std::swap(m.vertices[i][1], m.vertices[i][2]);
-        // inversion x et z
-        //std::swap(m.vertices[i][0], m.vertices[i][2]);
-        //m.vertices[i][1] -= 10;
+        // O vers la droite 1 vers le haut 2 profondeur
+        std::swap(statue.vertices[i][1], statue.vertices[i][2]);
+        statue.vertices[i][2] = -statue.vertices[i][2];
     }
+
+    float sum_x = 0., sum_y = 0., sum_z = 0.;
+    
+    for (int i = 0; i < statue.vertices.size(); i++)
+    {
+
+        // calcul du centre de l'objet
+
+        sum_x += statue.vertices[i][0];
+        sum_y += statue.vertices[i][1];
+        sum_z += statue.vertices[i][2];
+    }
+
+    // Center
+
+    Vector center(sum_x/statue.vertices.size(), sum_y/statue.vertices.size(), sum_z/statue.vertices.size());
+
+    // Unzoom
+    float zoom_coeff = 0.15;
+    for (int i = 0; i < statue.vertices.size(); i++)
+    {
+        statue.vertices[i][0] = zoom_coeff * (statue.vertices[i][0] - center[0]);
+        statue.vertices[i][1] = zoom_coeff * (statue.vertices[i][1] - center[1]);
+        statue.vertices[i][2] = zoom_coeff * (statue.vertices[i][2] - center[2]);
+        statue.vertices[i][1]+= 5;
+        statue.vertices[i][2] += 20;
+        statue.vertices[i][0] -= 10;
+    }
+
+
+    // Center duck
+
+    float sum_x_duck = 0., sum_y_duck = 0., sum_z_duck = 0.;
+    
+    for (int i = 0; i < duck.vertices.size(); i++)
+    {
+
+        // calcul du centre de l'objet
+
+        sum_x_duck += duck.vertices[i][0];
+        sum_y_duck += duck.vertices[i][1];
+        sum_z_duck += duck.vertices[i][2];
+    }
+
+    Vector center_duck(sum_x_duck/duck.vertices.size(), sum_y_duck/duck.vertices.size(), sum_z_duck/duck.vertices.size());
+
+    // Unzoom duck
+    float zoom_coeff_duck = 1;
+    for (int i = 0; i < duck.vertices.size(); i++)
+    {
+        duck.vertices[i][1] = -duck.vertices[i][1];
+        std::swap(duck.vertices[i][1], duck.vertices[i][2]);
+        duck.vertices[i][0] = zoom_coeff_duck * (duck.vertices[i][0] - center_duck[0]);
+        duck.vertices[i][1] = zoom_coeff_duck * (duck.vertices[i][1] - center_duck[1]);
+        duck.vertices[i][2] = zoom_coeff_duck * (duck.vertices[i][2] - center_duck[2]);
+        duck.vertices[i][2] -= 20;
+        duck.vertices[i][1] -= 10;
+        duck.vertices[i][0] += 10;
+        
+        
+    }
+
+
     //for (int i = 0; i < m.vertices.size(); i++)
     {
         //std::swap(m.normals[i][1], m.normals[i][2]);
         //std::swap(m.normals[i][0], m.normals[i][2]);
         //m.normals[i] = -m.normals[i];
     }
-    //m.buildBVH(m.BVH, 0, m.indices.size());
-    //m2.buildBVH(m2.BVH, 0, m2.indices.size());
+    statue.buildBVH(statue.BVH, 0, statue.indices.size());
+    duck.buildBVH(duck.BVH, 0, duck.indices.size());
     // mtable.buildBVH(mtable.BVH, 0, mtable.indices.size());
-    // m.buildBB();
+    // statue.buildBB();
 
     scene.objects.push_back(&Slum);
     scene.objects.push_back(&S1);
-    scene.objects.push_back(&S2);
+    //scene.objects.push_back(&S2);
     scene.objects.push_back(&S3);
     scene.objects.push_back(&Smurga);
     scene.objects.push_back(&Smurdr);
@@ -1129,8 +1207,8 @@ int main()
     // scene.objects.push_back(&Smurde);
     scene.objects.push_back(&Ssol);
     // scene.objects.push_back(&Splafond);
-    //scene.objects.push_back(&m);
-    //scene.objects.push_back(&m2);
+    scene.objects.push_back(&statue);
+    scene.objects.push_back(&duck);
     // scene.objects.push_back(&mtable);
     //scene.objects.push_back(&SMm);
 
@@ -1138,7 +1216,7 @@ int main()
 
     double fov = 60 * M_PI / 180;
 
-    int nbrays = 200;
+    int nbrays = 60;
     double angleVertical = 0 * M_PI / 180, angleHorizontal = 0 * M_PI / 180;
     Vector up(0, cos(angleVertical), sin(angleVertical));
     Vector right(cos(angleHorizontal), 0, sin(angleHorizontal));

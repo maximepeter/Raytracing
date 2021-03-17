@@ -142,15 +142,15 @@ Côté implémentation, il est nécessaire d'introduire une nouvelle classe Tria
 
 En important des maillages, on peut obtenir ce type de résultat :
 
-![Scène avec maillage](images/maillage.png)
+![Scène avec maillage](images/complex_scene.png)
 
 Les performances en terme de temps de calcul peuvent être améliorées dans la mesure où on réalise trop de test d'intéraction. Il est nécessaire de mettre en place des boîtes englobantes qui permettent d'économiser ces calculs.
 
 Le test à réaliser avant de faire les tests d'intersection est le test d'appartenance d'un triangle a une boite englobante. Ce test est réalisé selon le théorème de séparation des convexes. Si ce test n'est pas positif, on abandonne les calculs suivant et on passe à la suite.
 
-Une fois toutes les méthodes vues plus haut implémentées, il est possible de mettre en place une scène "complexe" comme suit :
+Une fois toutes les méthodes vues plus haut implémentées et en rajoutant les textures associées aux maillages, il est possible de mettre en place une scène "complexe" comme suit :
 
-![Scène finale](image/scene_finale.png)
+![Scène finale](images/scene_finale.png)
 
 ## Conclusion
 
